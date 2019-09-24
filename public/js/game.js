@@ -1,27 +1,63 @@
+var game;
+var gameOptions = {
+  tileSize: 100,
+  tilesWide: 8,
+  tilesHigh: 8
+}
+
+var gameUtils = {}
+gameUtils.getTilePosition = function(row, col) {
+  var posX = gameOptions.tileSize * col;
+  var posY = gameOptions.tileSize * row;
+  return new Phaser.Geom.Point(posX, posY);
+}
+
+var treeSprite = {
+  downNub: 4,
+  rightNub: 8,
+  downSegment: 3,
+  rightSegment: 0,
+  downIntersection: 6,
+  rightIntersection: 7,
+  elbow: 5,
+  flower: 1,
+  leaf: 2
+}
+
 class bootGame extends Phaser.Scene {
-    constructor() {
-        super("BootGame");
-    }
-    create() {
-        console.log("game is booting...");
-        this.scene.start("PlayGame");
-    }
+  constructor() {
+    super("BootGame");
+  }
+
+  preload() {
+    this.load.spritesheet("tree_tiles", "images/vines.png", {
+      frameWidth: gameOptions.tileSize,
+      frameHeight: gameOptions.tileSize
+    })
+  }
+
+  create() {
+    console.log("game is booting...");
+    this.scene.start("PlayGame");
+  }
 }
 
 class playGame extends Phaser.Scene {
-    constructor() {
-        super("PlayGame");
-    }
-    create() {
-        console.log("test");
-    }
+  constructor() {
+    super("PlayGame");
+  }
+
+  create() {
+    var tilePosition = gameUtils.getTilePosition(0,0);
+    this.add.image(tilePosition.x, tilePosition.y, "tree_tiles", treeSprite.downNub).setOrigin(0,0);
+    this.add.image(tilePosition.x, tilePosition.y, "tree_tiles", treeSprite.leaf).setOrigin(0,0);
+  }
 }
 
-var game;
 window.onload = function() {
   var gameConfig = {
-    width: 480,
-    height: 640,
+    width: gameOptions.tileSize * gameOptions.tilesWide,
+    height: gameOptions.tileSize * gameOptions.tilesHigh,
     scene: [bootGame, playGame]
   }
   game = new Phaser.Game(gameConfig);
