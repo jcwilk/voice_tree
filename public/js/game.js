@@ -132,7 +132,7 @@ function growTreeNode(node, rightOffset, depth, scene) {
 
       branchWidth+= reply.buildNodeSprites(rightOffset + branchWidth, depth + 1, extraWidth, treeSprite.rightIntersection, scene);
 
-      extraWidth = growTreeNode(reply, rightOffset + branchWidth, depth + 1, scene);
+      extraWidth = growTreeNode(reply, rightOffset + extraWidth, depth + 1, scene);
     }
 
     branchWidth += node.buildNub(rightOffset + branchWidth, depth + 1, treeSprite.rightNub, scene);
