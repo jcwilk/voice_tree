@@ -1,7 +1,7 @@
 var game;
 var gameOptions = {
   tileSize: 100,
-  tilesWide: 8,
+  tilesWide: 12,
   tilesHigh: 8
 }
 
@@ -42,6 +42,8 @@ class bootGame extends Phaser.Scene {
   }
 }
 
+var rootNode;
+
 class playGame extends Phaser.Scene {
   constructor() {
     super("PlayGame");
@@ -51,19 +53,21 @@ class playGame extends Phaser.Scene {
     // var tilePosition = gameUtils.getTilePosition(0,0);
     // this.add.image(tilePosition.x, tilePosition.y, "tree_tiles", treeSprite.downNub).setOrigin(0,0);
     // this.add.image(tilePosition.x, tilePosition.y, "tree_tiles", treeSprite.leaf).setOrigin(0,0);
-    var node = makeNode();
-    node.replies.push(makeNode());
-    node.replies.push(makeNode());
-    growTreeNode(node, 0, -1, this);
-
+    rootNode = makeNode();
+    // rootNode.replies.push(makeNode());
+    // rootNode.replies.push(makeNode());
+    // rootNode.replies.push(makeNode());
+    // rootNode.replies.push(makeNode());
+    growTreeNode(rootNode, 0, -1, this);
   }
 }
 
 function makeTreeSprite(col,row,frame,scene) {
   console.log("sprite"+frame+":"+col+","+row);
   var corner = gameUtils.getTilePosition(col,row);
-  return scene.add.image(corner.x, corner.y, "tree_tiles", frame).setOrigin(0,0);//.setVisible(false);
 
+  //NB: for some reason changing the origin to 0,0 fucks with click detection, not sure why. worked around it for now
+  return scene.add.image(corner.x+gameOptions.tileSize/2, corner.y+gameOptions.tileSize/2, "tree_tiles", frame);//.setVisible(false);
 }
 
 function makeNode() {
@@ -107,6 +111,11 @@ function makeNode() {
 
     obj.nub = makeTreeSprite(col, row, frameIndex, scene);
     obj.leaf = makeTreeSprite(col, row, treeSprite.leaf, scene);
+    obj.leaf.setInteractive().on('pointerdown', function(){
+      console.log('click');
+      obj.replies.push(makeNode());
+      growTreeNode(rootNode, 0, -1, scene);
+    })
 
     return 1;
   }
@@ -132,7 +141,7 @@ function growTreeNode(node, rightOffset, depth, scene) {
 
       branchWidth+= reply.buildNodeSprites(rightOffset + branchWidth, depth + 1, extraWidth, treeSprite.rightIntersection, scene);
 
-      extraWidth = growTreeNode(reply, rightOffset + extraWidth, depth + 1, scene);
+      extraWidth = growTreeNode(reply, rightOffset + branchWidth-1, depth + 1, scene);
     }
 
     branchWidth += node.buildNub(rightOffset + branchWidth, depth + 1, treeSprite.rightNub, scene);
