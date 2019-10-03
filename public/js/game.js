@@ -57,7 +57,7 @@ class playGame extends Phaser.Scene {
     // rootNode.replies.push(makeNode());
     // rootNode.replies.push(makeNode());
     // rootNode.replies.push(makeNode());
-    // rootNode.replies.push(makeNode());
+    //rootNode.replies.push(makeNode());
     growTreeNode(rootNode, 0, -1, this);
   }
 }
@@ -81,7 +81,7 @@ function makeNode() {
   }
 
   //builds node, flower, and segments leading up to it
-  obj.buildNodeSprites = function(col, row, minWidth, frameIndex, scene) {
+  obj.buildNodeSprites = function(col, row, tilesToSkip, frameIndex, scene) {
     if (obj.sprite) obj.sprite.destroy();
     if (obj.flower) obj.flower.destroy();
 
@@ -92,7 +92,7 @@ function makeNode() {
 
     var nodeWidth = 0;
 
-    for(var i = 0; i < minWidth-1; i++) {
+    for(var i = 0; i < tilesToSkip; i++) {
       obj.segments.push(makeTreeSprite(col + i, row, treeSprite.rightSegment, scene))
       nodeWidth++;
     }
@@ -125,28 +125,28 @@ function makeNode() {
 
 // Expands nubs and replies from a given node. node should already be built
 // Returns how many columns wide the total growth was, minimum is 1
-function growTreeNode(node, rightOffset, depth, scene) {
+function growTreeNode(node, col, row, scene) {
   if (node.replies.length < 1) {
-    return node.buildNub(rightOffset, depth + 1, treeSprite.downNub, scene);
+    return node.buildNub(col, row + 1, treeSprite.downNub, scene);
   } else {
 
     //grow first reply
     var reply = node.replies[0];
-    var branchWidth = reply.buildNodeSprites(rightOffset, depth + 1, 1, treeSprite.downIntersection, scene);
-    var extraWidth = growTreeNode(reply, rightOffset, depth + 1, scene);
+    var currentLength = reply.buildNodeSprites(col, row + 1, 1, treeSprite.downIntersection, scene);
+    var childLength = growTreeNode(reply, col, row + 1, scene);
 
     //loop through replies after the first
     for(var repliesIndex = 1; repliesIndex < node.replies.length; repliesIndex++) {
       reply = node.replies[repliesIndex];
 
-      branchWidth+= reply.buildNodeSprites(rightOffset + branchWidth, depth + 1, extraWidth, treeSprite.rightIntersection, scene);
+      currentLength+= reply.buildNodeSprites(col + currentLength, row + 1, extraWidth, treeSprite.rightIntersection, scene);
 
-      extraWidth = growTreeNode(reply, rightOffset + branchWidth-1, depth + 1, scene);
+      extraWidth = growTreeNode(reply, col + currentLength-1, row + 1, scene);
     }
 
-    branchWidth += node.buildNub(rightOffset + branchWidth, depth + 1, treeSprite.rightNub, scene);
+    currentLength += node.buildNub(col + currentLength, row + 1, treeSprite.rightNub, scene);
 
-    return branchWidth;
+    return currentLength;
   }
 }
 
