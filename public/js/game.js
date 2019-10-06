@@ -50,6 +50,9 @@ class playGame extends Phaser.Scene {
   }
 
   create() {
+    //NB - this needs to use this function or else this happens https://phaser.discourse.group/t/problem-with-setinteractive-function/3261/13
+    game.scale.setGameSize(gameConfig.width, gameConfig.height);
+
     // var tilePosition = gameUtils.getTilePosition(0,0);
     // this.add.image(tilePosition.x, tilePosition.y, "tree_tiles", treeSprite.downNub).setOrigin(0,0);
     // this.add.image(tilePosition.x, tilePosition.y, "tree_tiles", treeSprite.leaf).setOrigin(0,0);
@@ -172,9 +175,14 @@ function resizeGame() {
     var gameRatio = game.config.width / game.config.height;
 
     //NB - this needs to use this function or else this happens https://phaser.discourse.group/t/problem-with-setinteractive-function/3261/13
+    // these can't use the game.scale stuff because that causes the game to not scale..? Confusing
     if (windowRatio < gameRatio) {
-        game.scale.setGameSize(windowWidth, windowWidth / gameRatio);
+      canvas.style.width = (windowHeight * gameRatio) + "px";
+      canvas.style.height = windowHeight + "px";
+        //game.scale.setGameSize(windowWidth, windowWidth / gameRatio);
     } else {
-        game.scale.setGameSize(windowHeight * gameRatio, windowHeight);
+      canvas.style.width = (windowHeight * gameRatio) + "px";
+      canvas.style.height = windowHeight + "px";
+        //game.scale.setGameSize(windowHeight * gameRatio, windowHeight);
     }
 }
