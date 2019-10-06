@@ -50,10 +50,6 @@ class playGame extends Phaser.Scene {
   }
 
   create() {
-    //NB - required hack as per https://phaser.discourse.group/t/problem-with-setinteractive-function/3261/13
-    // otherwise clicks don't register until you flip it
-    this.scale.setGameSize(gameConfig.width, gameConfig.height);
-    
     // var tilePosition = gameUtils.getTilePosition(0,0);
     // this.add.image(tilePosition.x, tilePosition.y, "tree_tiles", treeSprite.downNub).setOrigin(0,0);
     // this.add.image(tilePosition.x, tilePosition.y, "tree_tiles", treeSprite.leaf).setOrigin(0,0);
@@ -174,11 +170,11 @@ function resizeGame() {
     var windowHeight = window.innerHeight;
     var windowRatio = windowWidth / windowHeight;
     var gameRatio = game.config.width / game.config.height;
+
+    //NB - this needs to use this function or else this happens https://phaser.discourse.group/t/problem-with-setinteractive-function/3261/13
     if (windowRatio < gameRatio) {
-        canvas.style.width = windowWidth + "px";
-        canvas.style.height = (windowWidth / gameRatio) + "px";
+        game.scale.setGameSize(windowWidth, windowWidth / gameRatio);
     } else {
-        canvas.style.width = (windowHeight * gameRatio) + "px";
-        canvas.style.height = windowHeight + "px";
+        game.scale.setGameSize(windowHeight * gameRatio, windowHeight);
     }
 }
