@@ -50,6 +50,10 @@ class playGame extends Phaser.Scene {
   }
 
   create() {
+    //NB - required hack as per https://phaser.discourse.group/t/problem-with-setinteractive-function/3261/13
+    // otherwise clicks don't register until you flip it
+    this.scale.setGameSize(gameConfig.width, gameConfig.height);
+    
     // var tilePosition = gameUtils.getTilePosition(0,0);
     // this.add.image(tilePosition.x, tilePosition.y, "tree_tiles", treeSprite.downNub).setOrigin(0,0);
     // this.add.image(tilePosition.x, tilePosition.y, "tree_tiles", treeSprite.leaf).setOrigin(0,0);
@@ -60,6 +64,13 @@ class playGame extends Phaser.Scene {
     // rootNode.replies.push(makeNode());
     growTreeNode(rootNode, 0, -1, this);
   }
+}
+
+var gameConfig = {
+  width: gameOptions.tileSize * gameOptions.tilesWide,
+  height: gameOptions.tileSize * gameOptions.tilesHigh,
+  scene: [bootGame, playGame]//,
+  //backgroundColor: 0x00ffff
 }
 
 function makeTreeSprite(col,row,frame,scene) {
@@ -151,12 +162,6 @@ function growTreeNode(node, rightOffset, depth, scene) {
 }
 
 window.onload = function() {
-  var gameConfig = {
-    width: gameOptions.tileSize * gameOptions.tilesWide,
-    height: gameOptions.tileSize * gameOptions.tilesHigh,
-    scene: [bootGame, playGame]//,
-    //backgroundColor: 0x00ffff
-  }
   game = new Phaser.Game(gameConfig);
   window.focus()
   resizeGame();
