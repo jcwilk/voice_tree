@@ -1,8 +1,7 @@
 var game;
 var gameOptions = {
   tileSize: 100,
-  tilesWide: 12,
-  tilesHigh: 8
+  tilesWide: 12
 }
 
 var gameUtils = {}
@@ -11,6 +10,12 @@ gameUtils.getTilePosition = function(col, row) {
   var posY = gameOptions.tileSize * row;
   return new Phaser.Geom.Point(posX, posY);
 }
+
+gameUtils.getPixelWidth = function() {
+  return gameOptions.tileSize * gameOptions.tilesWide;
+}
+
+var pixelHeight = gameUtils.getPixelWidth();
 
 var treeSprite = {
   downNub: 4,
@@ -51,7 +56,7 @@ class playGame extends Phaser.Scene {
 
   create() {
     //NB - this needs to use this function or else this happens https://phaser.discourse.group/t/problem-with-setinteractive-function/3261/13
-    game.scale.setGameSize(gameConfig.width, gameConfig.height);
+    //game.scale.setGameSize(gameConfig.width, gameConfig.height);
 
     // var tilePosition = gameUtils.getTilePosition(0,0);
     // this.add.image(tilePosition.x, tilePosition.y, "tree_tiles", treeSprite.downNub).setOrigin(0,0);
@@ -168,21 +173,23 @@ window.onload = function() {
 }
 
 function resizeGame() {
-    var canvas = document.querySelector("canvas");
-    var windowWidth = window.innerWidth;
-    var windowHeight = window.innerHeight;
-    var windowRatio = windowWidth / windowHeight;
-    var gameRatio = game.config.width / game.config.height;
+  var canvas = document.querySelector("canvas");
+  var windowWidth = window.innerWidth;
+  var windowHeight = window.innerHeight;
+  var windowRatio = windowWidth / windowHeight;
 
-    //NB - this needs to use this function or else this happens https://phaser.discourse.group/t/problem-with-setinteractive-function/3261/13
-    // these can't use the game.scale stuff because that causes the game to not scale..? Confusing
-    if (windowRatio < gameRatio) {
-      canvas.style.width = (windowHeight * gameRatio) + "px";
-      canvas.style.height = windowHeight + "px";
-        //game.scale.setGameSize(windowWidth, windowWidth / gameRatio);
-    } else {
-      canvas.style.width = (windowHeight * gameRatio) + "px";
-      canvas.style.height = windowHeight + "px";
-        //game.scale.setGameSize(windowHeight * gameRatio, windowHeight);
-    }
+  //NB - setting it to 100% makes it look ugly mid-resize
+  canvas.style.width = windowWidth+"px";
+  canvas.style.height = windowHeight+"px";
+
+  if (windowWidth < windowHeight) {
+    pixelHeight = Math.floor(gameUtils.getPixelWidth() / windowRatio);
+    game.scale.setGameSize(gameUtils.getPixelWidth(), pixelHeight);
+  }
+  else {
+    pixelHeight = Math.floor(gameUtils.getPixelWidth() * windowRatio);
+    game.scale.setGameSize(pixelHeight, gameUtils.getPixelWidth());
+  }
+
+
 }
